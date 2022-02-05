@@ -15,7 +15,7 @@ jupyter:
 O NameNode, armazena os metadados dos arquivos (componente central do HDFS)
 
 ```python
-
+Teste
 ```
 
 # Apache Hadoop

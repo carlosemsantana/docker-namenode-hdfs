@@ -1,21 +1,7 @@
----
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.13.6
-  kernelspec:
-    display_name: Python 3 (ipykernel)
-    language: python
-    name: python3
----
-
-# Armazenamento de Dados com Apache Hadoop HDFS
+# Armazenamento de Dados com Apache Hadoop 3.3.1 HDFS
 
 
-Este artigo foi inspirado no conteúdo do curso de Engenharia de Dados, módulo Big Data Foundations na Semantix Academy.
+Este artigo foi inspirado no conteúdo do curso de Engenharia de Dados, módulo Big Data Foundations na Semantix Academy e documentação do projeto Apache Hadoop 3.
 
 
 # Apache Hadoop
@@ -30,43 +16,59 @@ A biblioteca de software Apache Hadoop é uma estrutura que permite o processame
 
 O Hadoop Distributed File System (HDFS) é um sistema de arquivos distribuído projetado para ser executado em hardware comum. Ele tem muitas semelhanças com os sistemas de arquivos distribuídos existentes. No entanto, as diferenças de outros sistemas de arquivos distribuídos são significativas. O HDFS é altamente tolerante a falhas e foi projetado para ser implantado em hardware de baixo custo. O HDFS fornece acesso de alta taxa de transferência aos dados do aplicativo e é adequado para aplicativos que possuem grandes conjuntos de dados. O HDFS relaxa alguns requisitos POSIX para permitir o acesso de streaming aos dados do sistema de arquivos. O HDFS foi originalmente construído como infraestrutura para o projeto de mecanismo de pesquisa da Web Apache Nutch. O HDFS faz parte do projeto Apache Hadoop Core.
 
+(Projeto: [http://hadoop.apache.org/](http://hadoop.apache.org/))
+
 
 ### Falha de hardware
 
 
-A falha de hardware é a norma e não a exceção. Uma instância HDFS pode consistir em centenas ou milhares de máquinas servidoras, cada uma armazenando parte dos dados do sistema de arquivos. O fato de que há um grande número de componentes e que cada componente tem uma probabilidade não trivial de falha significa que algum componente do HDFS é sempre não funcional. Portanto, a detecção de falhas e a recuperação rápida e automática delas é um objetivo arquitetural central do HDFS.
+O HDFS foi projetado considerando que a falha de hardware vai acontecer. Portanto, a detecção de falhas e a recuperação rápida e automática delas é um objetivo arquitetural central do HDFS.
 
 
 ### Acesso a dados de streaming
 
 
-Os aplicativos executados em HDFS precisam de acesso de streaming a seus conjuntos de dados. Eles não são aplicativos de uso geral que normalmente são executados em sistemas de arquivos de uso geral. O HDFS foi projetado mais para processamento em lote do que para uso interativo pelos usuários. A ênfase está na alta taxa de transferência de acesso a dados, em vez de baixa latência de acesso a dados. O POSIX impõe muitos requisitos rígidos que não são necessários para aplicativos direcionados para HDFS. A semântica POSIX em algumas áreas-chave foi negociada para aumentar as taxas de transferência de dados.
+O HDFS foi projetado considerando principalmente o processamento dos dados em lote.
 
 
 ### Grandes conjuntos de dados
 
 
-Os aplicativos executados no HDFS têm grandes conjuntos de dados. Um arquivo típico no HDFS tem tamanho de gigabytes a terabytes. Assim, o HDFS é ajustado para suportar arquivos grandes. Ele deve fornecer alta largura de banda de dados agregados e escalar para centenas de nós em um único cluster. Deve suportar dezenas de milhões de arquivos em uma única instância.
+O HDFS é ajustado para suportar grandes volumes de dados e escalar para centenas de nós em um único cluster. Deve suportar dezenas de milhões de arquivos em uma única instância.
 
 
 ### Acesso leitura e gração dos arquivos
 
 
-Os aplicativos HDFS precisam de um modelo de acesso de gravação uma vez, leitura e muitos para arquivos. Um arquivo uma vez criado, escrito e fechado não precisa ser alterado, exceto para acréscimos e truncamentos. Anexar o conteúdo ao final dos arquivos é suportado, mas não pode ser atualizado em um ponto arbitrário. Essa suposição simplifica os problemas de coerência de dados e permite o acesso a dados de alto rendimento. Um aplicativo MapReduce ou um aplicativo rastreador da Web se encaixa perfeitamente nesse modelo.
+O HDFS pode ser usado como parte da estratégia em um "Data Lake", mas é interessante considerar que o conteúdo gravado esteja em formato imutável. Essa suposição simplifica os problemas de coerência de dados e permite o acesso a dados de alto rendimento. 
+
+
+### Movimentação dos dados
+
+
+O HDFS fornece interfaces para otimizar o acesso aos dados pelos os aplicativos.
+
+
+### Portabilidade entre plataformas heterogêneas de hardware e software 
+
+
+O HDFS foi projetado para ser facilmente portátil de uma plataforma para outra. Isso facilita a ampla adoção do HDFS como plataforma de escolha para um grande conjunto de aplicativos. 
 
 
 ### NameNode e DataNodes
 
 
-O HDFS tem uma arquitetura mestre/escravo. Um cluster HDFS consiste em um único NameNode, um servidor mestre que gerencia o namespace do sistema de arquivos e regula o acesso aos arquivos pelos clientes. Além disso, há vários DataNodes, geralmente um por nó no cluster, que gerenciam o armazenamento anexado aos nós em que são executados. O HDFS expõe um namespace do sistema de arquivos e permite que os dados do usuário sejam armazenados em arquivos. Internamente, um arquivo é dividido em um ou mais blocos e esses blocos são armazenados em um conjunto de DataNodes. O NameNode executa operações de namespace do sistema de arquivos, como abrir, fechar e renomear arquivos e diretórios. Também determina o mapeamento de blocos para DataNodes. Os DataNodes são responsáveis ​​por atender as solicitações de leitura e gravação dos clientes do sistema de arquivos.
+O HDFS tem uma arquitetura mestre/escravo. Um cluster HDFS consiste em um único NameNode, um servidor mestre que gerencia o namespace do sistema de arquivos e regula o acesso aos arquivos pelos clientes. Além disso, há vários DataNodes, geralmente um por nó no cluster, que gerenciam o armazenamento anexado aos nós em que são executados. O HDFS expõe um namespace do sistema de arquivos e permite que os dados do usuário sejam armazenados em arquivos. Internamente, um arquivo é dividido em um ou mais blocos e esses blocos são armazenados em um conjunto de DataNodes. O NameNode executa operações de namespace do sistema de arquivos, como abrir, fechar e renomear arquivos e diretórios. Também determina o mapeamento de blocos para DataNodes. Os DataNodes são responsáveis ​​por atender as solicitações de leitura e gravação dos clientes do sistema de arquivos. Os DataNodes também executam a criação, exclusão e replicação de blocos mediante instrução do NameNode. 
 
 
---- Imagem ---
 
 
 O NameNode e o DataNode são softwares projetados para serem executados em máquinas comuns. Essas máquinas normalmente executam um sistema operacional (SO) GNU/Linux. O HDFS é construído usando a linguagem Java; qualquer máquina que suporte Java pode executar o software NameNode ou DataNode. O uso da linguagem Java altamente portátil significa que o HDFS pode ser implementado em uma ampla variedade de máquinas. Uma implantação típica tem uma máquina dedicada que executa apenas o software NameNode. Cada uma das outras máquinas no cluster executa uma instância do software DataNode. A arquitetura não impede a execução de vários DataNodes na mesma máquina, mas em uma implantação real que raramente é o caso.
 
-A existência de um único NameNode em um cluster simplifica muito a arquitetura do sistema. O NameNode é o árbitro e o repositório de todos os metadados do HDFS. O sistema é projetado de forma que os dados do usuário nunca fluam pelo NameNode.
+A existência de um único NameNode em um cluster simplifica muito a arquitetura do sistema. O NameNode é o árbitro e o repositório de todos os metadados do HDFS. O sistema é projetado de forma que os dados do usuário nunca fluam pelo NameNode. 
+
+
+<img src="arquiteruraHDFS.png" alt="Arquitetura do HDFS">
 
 
 ### O namespace do sistema de arquivos
@@ -74,7 +76,7 @@ A existência de um único NameNode em um cluster simplifica muito a arquitetura
 
 O HDFS suporta uma organização de arquivos hierárquica tradicional. Um usuário ou um aplicativo pode criar diretórios e armazenar arquivos dentro desses diretórios. A hierarquia do namespace do sistema de arquivos é semelhante à maioria dos outros sistemas de arquivos existentes; pode-se criar e remover arquivos, mover um arquivo de um diretório para outro ou renomear um arquivo. O HDFS oferece suporte a cotas de usuários e permissões de acesso . O HDFS não oferece suporte a links físicos ou links flexíveis. No entanto, a arquitetura HDFS não impede a implementação desses recursos.
 
-Embora o HDFS siga a convenção de nomenclatura do FileSystem , alguns caminhos e nomes (por exemplo , /.reserved e .snapshot ) são reservados. Recursos como criptografia transparente e instantâneo usam caminhos reservados.
+Embora o HDFS siga a convenção de nomenclatura do FileSystem, alguns caminhos e nomes (por exemplo , /.reserved e .snapshot ) são reservados. Recursos como criptografia transparente e instantâneo usam caminhos reservados.
 
 O NameNode mantém o namespace do sistema de arquivos. Qualquer alteração no namespace do sistema de arquivos ou em suas propriedades é registrada pelo NameNode. Um aplicativo pode especificar o número de réplicas de um arquivo que deve ser mantido pelo HDFS. O número de cópias de um arquivo é chamado de fator de replicação desse arquivo. Essas informações são armazenadas pelo NameNode.
 
@@ -91,7 +93,16 @@ Um aplicativo pode especificar o número de réplicas de um arquivo. O fator de 
 O NameNode toma todas as decisões relativas à replicação de blocos. Ele recebe periodicamente um Heartbeat e um Blockreport de cada um dos DataNodes no cluster. O recebimento de um Heartbeat implica que o DataNode está funcionando corretamente. Um Blockreport contém uma lista de todos os blocos em um DataNode.
 
 
-### Colocação de réplicas: os primeiros passos do bebê
+### Blocos de dados
+
+
+O HDFS foi projetado para suportar arquivos muito grandes. Os aplicativos compatíveis com HDFS são aqueles que lidam com grandes conjuntos de dados. Esses aplicativos gravam seus dados apenas uma vez, mas os leem uma ou mais vezes e exigem que essas leituras sejam satisfeitas em velocidades de streaming. Um tamanho de bloco típico usado pelo HDFS é 128 MB. Assim, um arquivo HDFS é dividido em pedaços de 128 MB e, se possível, cada pedaço residirá em um DataNode diferente.
+
+
+<img src="arquiteruraHDFSReplicaçãoBlocos.png" alt="Replicação no Blocos HDFS">
+
+
+### Distribuição das Réplicas
 
 
 O posicionamento das réplicas é fundamental para a confiabilidade e o desempenho do HDFS. A otimização do posicionamento da réplica diferencia o HDFS da maioria dos outros sistemas de arquivos distribuídos. Este é um recurso que precisa de muito ajuste e experiência. A finalidade de uma política de posicionamento de réplica com reconhecimento de rack é melhorar a confiabilidade, a disponibilidade e a utilização da largura de banda da rede. A implementação atual da política de posicionamento de réplicas é um primeiro esforço nessa direção. Os objetivos de curto prazo da implementação dessa política são validá-la em sistemas de produção, aprender mais sobre seu comportamento e construir uma base para testar e pesquisar políticas mais sofisticadas.
@@ -151,12 +162,12 @@ Todos os protocolos de comunicação HDFS são sobrepostos ao protocolo TCP/IP. 
 O objetivo principal do HDFS é armazenar dados de forma confiável mesmo na presença de falhas. Os três tipos comuns de falhas são falhas de NameNode, falhas de DataNode e partições de rede.
 
 
-### Falha no disco de dados, batimentos cardíacos e replicação
+### Falha no disco de dados, disponibilidadee replicação
 
 
 Cada DataNode envia uma mensagem Heartbeat para o NameNode periodicamente. Uma partição de rede pode fazer com que um subconjunto de DataNodes perca a conectividade com o NameNode. O NameNode detecta essa condição pela ausência de uma mensagem Heartbeat. O NameNode marca DataNodes sem Heartbeats recentes como mortos e não encaminha novas solicitações de IO para eles. Quaisquer dados que foram registrados em um DataNode morto não estão mais disponíveis para o HDFS. A morte do DataNode pode fazer com que o fator de replicação de alguns blocos fique abaixo do valor especificado. O NameNode rastreia constantemente quais blocos precisam ser replicados e inicia a replicação sempre que necessário. A necessidade de replicação pode surgir devido a vários motivos: um DataNode pode ficar indisponível, uma réplica pode ficar corrompida, um disco rígido em um DataNode pode falhar,
 
-O tempo limite para marcar DataNodes morto é conservadoramente longo (mais de 10 minutos por padrão) para evitar a tempestade de replicação causada pela oscilação de estado de DataNodes. Os usuários podem definir um intervalo mais curto para marcar DataNodes como obsoletos e evitar nós obsoletos na leitura e/ou gravação por configuração para cargas de trabalho sensíveis ao desempenho.
+O tempo limite para marcar DataNodes morto é conservadoramente longo (mais de 10 minutos por padrão) para evitar a sobrecarga de replicação causada pela oscilação de estado de DataNodes. Os usuários podem definir um intervalo mais curto para marcar DataNodes como obsoletos e evitar nós obsoletos na leitura e/ou gravação por configuração para cargas de trabalho sensíveis ao desempenho.
 
 
 ### Rebalanceamento de cluster
@@ -179,16 +190,10 @@ O FsImage e o EditLog são estruturas de dados centrais do HDFS. A corrupção d
 Outra opção para aumentar a resiliência contra falhas é habilitar a alta disponibilidade usando vários NameNodes com um armazenamento compartilhado no NFS ou usando um log de edição distribuído (chamado Journal). Esta última é a abordagem recomendada.
 
 
-### Instantâneos
+### Cópia de um instante (retrato) 
 
 
-Os instantâneos suportam o armazenamento de uma cópia de dados em um determinado instante de tempo. Um uso do recurso de instantâneo pode ser reverter uma instância HDFS corrompida para um ponto no tempo previamente conhecido.
-
-
-### Blocos de dados
-
-
-O HDFS foi projetado para suportar arquivos muito grandes. Os aplicativos compatíveis com HDFS são aqueles que lidam com grandes conjuntos de dados. Esses aplicativos gravam seus dados apenas uma vez, mas os leem uma ou mais vezes e exigem que essas leituras sejam satisfeitas em velocidades de streaming. O HDFS oferece suporte à semântica de gravação uma vez-leitura-muitos em arquivos. Um tamanho de bloco típico usado pelo HDFS é 128 MB. Assim, um arquivo HDFS é dividido em pedaços de 128 MB e, se possível, cada pedaço residirá em um DataNode diferente.
+Os "snapshots" (retratos de um instante) suportam o armazenamento de uma cópia de dados em um determinado instante de tempo. Um uso do recurso de snapshots pode ser reverter uma instância HDFS corrompida para um ponto no tempo previamente conhecido.
 
 
 ### Pipeline de replicação
@@ -208,94 +213,185 @@ O HDFS pode ser acessado de aplicativos de muitas maneiras diferentes. Nativamen
 ### FS Shell
 
 
-O HDFS permite que os dados do usuário sejam organizados na forma de arquivos e diretórios. Ele fornece uma interface de linha de comando chamada shell FS que permite que um usuário interaja com os dados no HDFS. A sintaxe deste conjunto de comandos é semelhante a outros shells (por exemplo, bash, csh) com os quais os usuários já estão familiarizados. Aqui estão alguns exemplos de pares de ação/comando:
+O HDFS permite que os dados do usuário sejam organizados na forma de arquivos e diretórios. Ele fornece uma interface de linha de comando chamada shell FS que permite que um usuário interaja com os dados no HDFS. A sintaxe deste conjunto de comandos é semelhante a outros shells (por exemplo, bash, csh) com os quais os usuários já estão familiarizados. O shell FS é direcionado para aplicativos que precisam de uma linguagem de script para interagir com os dados armazenados.
 
 
-Ação | comandos
+### Exemplos de operações simples 
 
-Crie um diretório chamado /foodir	bin/hadoop dfs -mkdir /foodir
+<!-- #region -->
+Para executar os próximos exemplos, você precisa baixar e instalar alguns "contâniners" docker em sua máquina. Estou estudando a partir de um cluster de Big Data disponibilizado no curso de Engenharia de Dados na Semantix Academy.
 
-Remova um diretório chamado /foodir	bin/hadoop fs -rm -R /foodir
+#### Baixar o conteúdo do Cluster
+```Python
+$ git clone https://github.com/rodrigo-reboucas/docker-bigdata.git
+``` 
 
-Visualize o conteúdo de um arquivo chamado /foodir/myfile.txt	bin/hadoop dfs -cat /foodir/myfile.txt
+#### Resultado:
 
+<img src="git-clone-cluster.png" alt="Download do Cluster">
 
+#### Baixar as Imagens do Cluster
+```Python
+$ docker-compose pull
+``` 
+#### Resultado:
 
-O shell FS é direcionado para aplicativos que precisam de uma linguagem de script para interagir com os dados armazenados.
-
-
-### DFSAdmin
-
-
-O conjunto de comandos DFSAdmin é usado para administrar um cluster HDFS. Esses são comandos usados ​​apenas por um administrador do HDFS. Aqui estão alguns exemplos de pares de ação/comando:
-
-
-Ação | comando
-
-
-Coloque o cluster no modo de segurança	bin/hdfs dfsadmin -safemode enter
-
-Gerar uma lista de DataNodes	bin/hdfs dfsadmin -relatório
-
-DataNode(s) de recomissionamento ou descomissionamento	bin/hdfs dfsadmin -refreshNodes
+<img src="docker-compose-pull.png" alt="Instalação do Cluster">
 
 
+#### Executar os containers
+```Python
+$ docker-compose up –d
+```
+#### Resultado:
 
-### Interface do navegador
-
-
-Uma instalação típica do HDFS configura um servidor web para expor o namespace HDFS por meio de uma porta TCP configurável. Isso permite que um usuário navegue no namespace HDFS e visualize o conteúdo de seus arquivos usando um navegador da web.
-
-
-### Exclusão e recuperação de arquivos
-
-
-Se a configuração da lixeira estiver habilitada, os arquivos removidos pelo FS Shell não serão removidos imediatamente do HDFS. Em vez disso, o HDFS o move para um diretório trash (cada usuário tem seu próprio diretório trash em /user/<username>/.Trash ). O arquivo pode ser restaurado rapidamente, desde que permaneça na lixeira.
-
-Os arquivos excluídos mais recentes são movidos para o diretório de lixo atual ( /user/<username>/.Trash/Current ), e em um intervalo configurável, o HDFS cria pontos de verificação (em /user/<username>/.Trash/<date> ) para arquivos no diretório de lixo atual e exclui pontos de verificação antigos quando expiram. Veja o comando expunge do shell FS sobre o checkpoint de lixo.
-
-Após o término de sua vida na lixeira, o NameNode exclui o arquivo do namespace HDFS. A exclusão de um arquivo faz com que os blocos associados ao arquivo sejam liberados. Observe que pode haver um atraso de tempo considerável entre o momento em que um arquivo é excluído por um usuário e o momento do aumento correspondente no espaço livre no HDFS.
-
-A seguir está um exemplo que mostrará como os arquivos são excluídos do HDFS pelo FS Shell. Criamos 2 arquivos (test1 e test2) no diretório delete
+<img src="docker-compose-upd.png" alt="Inicializando o Cluster">
 
 
+#### Listar o contâiner NameNode, o qual iremos trabalhar
+```Python
+$ docker ps | grep "namenode"
+``` 
+#### Resultado:
+<img src="grep-namenode.png" alt="Contâiner NameNode">
+<!-- #endregion -->
 
+#### Comandos HDFS
 
-$ hadoop fs -mkdir -p delete/test1
-$ hadoop fs -mkdir -p delete/test2
-$ hadoop fs -ls delete/
-Encontrados 2 itens
-drwxr-xr-x - hadoop hadoop 0 2015-05-08 12:39 delete/test1
-drwxr-xr-x - hadoop hadoop 0 2015-05-08 12:40 delete/test2
+1. Acessar o shell do contâiner NameNode
 
+```Python
+$ docker exec -it namenode bash
+```
 
-Vamos remover o arquivo test1. O comentário abaixo mostra que o arquivo foi movido para o diretório Lixeira.
+#### Resultado:
+<img src="FS-Shell.png" alt="Acesso no Shell do Linux do contâiner">
 
 
 
+2. Criar a estrutura de pastas com seguintes nomes: data, recover e delete.
 
-$ hadoop fs -rm -r delete/test1
-Movido: hdfs://localhost:8020/user/hadoop/delete/test1 para a lixeira em: hdfs://localhost:8020/user/hadoop/.Trash/Current
+```Python
+$ hdfs dfs -mkdir -p /user/santana/data
+$ hdfs dfs -mkdir -p /user/santana/recover
+$ hdfs dfs -mkdir -p /user/santana/delete
 
+```
+3. Listar a estrutura de pastas.
 
-agora vamos remover o arquivo com a opção skipTrash, que não enviará o arquivo para a Lixeira. Ele será completamente removido do HDFS.
-
-
-
-
-$ hadoop fs -rm -r -skipTrash delete/test2
-Apagar/teste2
-
-
-Podemos ver agora que o diretório Trash contém apenas o arquivo test1.
+#### Resultado:
+<img src="hdfs-dfs-mkdir.png" alt="Cria estrutura de Diretórios">
 
 
-$ hadoop fs -ls .Trash/Current/user/hadoop/delete/
-Encontrado 1 item\
-drwxr-xr-x - hadoop hadoop 0 08-05-2015 12:39 .Lixeira/Atual/usuário/hadoop/excluir/teste1
+
+4. Enviar a pasta “/input/exercises-data/escola” e o arquivo “/input/exercises-data/entrada1.txt” para data
+
+<img src="estruturaArquivos-01.png" alt="Lista estrutura de Diretórios">
 
 
-Assim, o arquivo test1 vai para a Lixeira e o arquivo test2 é excluído permanentemente.
+
+Note que: a pasta “/input/exercises-data/escola” está na sua máquina local e o diretório **data** está na estrutura de arquivos do Hadoop HDFS.
+
+
+```Python
+$ hdfs dfs -put /input/exercises-data/escola/ /user/santana/data
+$ hdfs dfs -put /input/exercises-data/entrada1.txt /user/santana/data
+```
+#### Resultado:
+<img src="hdfs-dfs-ls.png" alt="Lista arquivo e diretório copiado">
+
+
+5. Mover o arquivo “entrada1.txt” para recover
+
+```Python
+$ hdfs dfs -mv /user/santana/data/entrada1.txt /user/santana/recover
+```
+
+#### Resultado:
+<img src="hdfs-dfs-ls2.png" alt="Lista arquivo e diretório copiado">
+
+
+6. Baixar o arquivo do hdfs “escola/alunos.json” para o sistema local /
+
+```Python
+$ hdfs dfs -get /user/santana/data/escola/alunos.json /diretorio_local/alunos.json
+```
+
+#### Resultado:
+<img src="hdfs-dfs-get.png" alt="Baixar arquivo para sistema local de arquivos">
+
+
+7. Apagar a pasta recover (no HDFS)
+
+```Python
+$ hdfs dfs -rm -R /user/santana/recover
+```
+
+#### Resultado:
+<img src="hdfs-dfs-rm.png" alt="Apagar a pasta recover (no HDFS)">
+
+
+**ATENÇÃO: Quando as operações envolverem ações que vão apagar ou mover conjunto de dados, tome sempre cuidado especial.**
+
+
+8. Deletar permanentemente o diretório delete (no HDFS)
+
+```Python
+$ hdfs dfs -rm -R -skipTrash /user/santana/delete
+```
+
+#### Resultado:
+<img src="hdfs-dfs-rm2.png" alt="Apagar a pasta delete (no HDFS)">
+
+
+9. Procurar o arquivo “alunos.csv” dentro do /user
+
+```Python
+$ hdfs dfs -find /user/ -name \alunos.csv
+```
+
+#### Resultado:
+<img src="hdfs-dfs-find.png" alt="Procurar o arquivo “alunos.csv” dentro do /user">
+
+
+10. Mostrar o último 1KB do arquivo “alunos.csv”
+
+```Python
+$ hdfs dfs -tail /user/santana/data/escola/alunos.csv
+```
+
+#### Resultado:
+<img src="hdfs-dfs-tail.png" alt="Mostrar o último 1KB do arquivo “alunos.csv”">
+
+
+11. Mostrar as 2 primeiras linhas do arquivo “alunos.csv”
+
+```Python
+$ hdfs dfs -cat /user/santana/data/escola/alunos.csv | head -n 2
+```
+
+#### Resultado:
+<img src="hdfs-dfs-cat-head.png" alt="Mostrar as 2 primeiras linhas do arquivo “alunos.csv”">
+
+
+12. Verificação de soma das informações do arquivo “alunos.csv”
+
+```Python
+$ hdfs dfs -checksum /user/santana/data/escola/alunos.csv
+```
+
+#### Resultado:
+<img src="hdfs-dfs-checksum.png" alt="Verificação de soma das informações do arquivo “alunos.csv”">
+
+
+13. Criar um arquivo em branco com o nome de “test” no data 
+
+```Python
+$ hdfs dfs -touchz /user/santana/data/test
+```
+
+#### Resultado:
+<img src="hdfs-dfs-touchz.png" alt="Criar um arquivo em branco ">
 
 
 ### Diminuir o fator de replicação
@@ -304,21 +400,55 @@ Assim, o arquivo test1 vai para a Lixeira e o arquivo test2 é excluído permane
 
 Quando o fator de replicação de um arquivo é reduzido, o NameNode seleciona réplicas em excesso que podem ser excluídas. O próximo Heartbeat transfere essas informações para o DataNode. O DataNode então remove os blocos correspondentes e o espaço livre correspondente aparece no cluster. Mais uma vez, pode haver um atraso entre a conclusão da chamada da API setReplication e o aparecimento de espaço livre no cluster.
 
-```python
+
+14. Alterar o fator de replicação do arquivo “test” para 2
+
+```Python
+$ hdfs dfs -setrep 2 /user/santana/data/test
+```
+
+#### Resultado:
+<img src="hdfs-dfs-setrep.png" alt="Alterar o fator de replicação do arquivo “test” para 2">
+
+
+15. Ver as informações do arquivo “alunos.csv”
+
+```Python
+$ hdfs dfs -stat %n /user/santana/data/test
+$ hdfs dfs -stat %o /user/santana/data/test
+$ hdfs dfs -stat %r /user/santana/data/test
+$ hdfs dfs -stat %u /user/santana/data/test
 
 ```
 
-### Referencia:
+#### Resultado:
+<img src="hdfs-dfs-stats.png" alt="Alterar o fator de replicação do arquivo “test” para 2">
+
+
+16. Exibir o espaço livre do data (no HDFS) e o uso do disco
+
+```Python
+$ hdfs dfs -df -h
+$ hdfs dfs -du -h /user
+
+```
+
+#### Resultado:
+<img src="hdfs-dfs-df.png" alt="Exibir o espaço livre do data (no HDFS) e o uso do disco">
+
+
+Pronto!
+
+Chegou o final da jornada exploratória para conhecermos um pouquinho o Apache Hadoop HDFS, tem muito mais comandos e funcionalidades que não foram exploradas aqui, consulte a documentação de referência.
+
+Espero ter contribuido com o seu desenvolvimento de alguma forma.
+
+[Carlos Eugênio](https://github.com/carlosemsantana)
+
+
+### Referência:
 
 
 * [https://academy.semantix.com.br](https://academy.semantix.com.br)
-* [https://hadoop.apache.org/core/docs/current/api/](https://hadoop.apache.org/core/docs/current/api/)
-
-
-Hadoop JavaDoc API .
-
-Código fonte do HDFS: http://hadoop.apache.org/version_control.html
-
-```python
-
-```
+* [https://hadoop.apache.org/docs/r3.3.1/](https://hadoop.apache.org/docs/r3.3.1/)
+* [https://hadoop.apache.org/docs/r3.3.1/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html](https://hadoop.apache.org/docs/r3.3.1/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html)

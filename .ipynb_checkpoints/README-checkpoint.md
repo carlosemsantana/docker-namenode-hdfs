@@ -68,7 +68,7 @@ O NameNode e o DataNode são softwares projetados para serem executados em máqu
 A existência de um único NameNode em um cluster simplifica muito a arquitetura do sistema. O NameNode é o árbitro e o repositório de todos os metadados do HDFS. O sistema é projetado de forma que os dados do usuário nunca fluam pelo NameNode. 
 
 
-<img src="arquiteruraHDFS.png" alt="Arquitetura do HDFS">
+<img src="img/arquiteruraHDFS.png" alt="Arquitetura do HDFS">
 
 
 ### O namespace do sistema de arquivos
@@ -99,7 +99,7 @@ O NameNode toma todas as decisões relativas à replicação de blocos. Ele rece
 O HDFS foi projetado para suportar arquivos muito grandes. Os aplicativos compatíveis com HDFS são aqueles que lidam com grandes conjuntos de dados. Esses aplicativos gravam seus dados apenas uma vez, mas os leem uma ou mais vezes e exigem que essas leituras sejam satisfeitas em velocidades de streaming. Um tamanho de bloco típico usado pelo HDFS é 128 MB. Assim, um arquivo HDFS é dividido em pedaços de 128 MB e, se possível, cada pedaço residirá em um DataNode diferente.
 
 
-<img src="arquiteruraHDFSReplicaçãoBlocos.png" alt="Replicação no Blocos HDFS">
+<img src="img/arquiteruraHDFSReplicaçãoBlocos.png" alt="Replicação no Blocos HDFS">
 
 
 ### Distribuição das Réplicas
@@ -228,7 +228,7 @@ $ git clone https://github.com/rodrigo-reboucas/docker-bigdata.git
 
 #### Resultado:
 
-<img src="git-clone-cluster.png" alt="Download do Cluster">
+<img src="img/git-clone-cluster.png" alt="Download do Cluster">
 
 #### Baixar as Imagens do Cluster
 ```Python
@@ -236,7 +236,7 @@ $ docker-compose pull
 ``` 
 #### Resultado:
 
-<img src="docker-compose-pull.png" alt="Instalação do Cluster">
+<img src="img/docker-compose-pull.png" alt="Instalação do Cluster">
 
 
 #### Executar os containers
@@ -245,7 +245,7 @@ $ docker-compose up –d
 ```
 #### Resultado:
 
-<img src="docker-compose-upd.png" alt="Inicializando o Cluster">
+<img src="img/docker-compose-upd.png" alt="Inicializando o Cluster">
 
 
 #### Listar o contâiner NameNode, o qual iremos trabalhar
@@ -253,7 +253,7 @@ $ docker-compose up –d
 $ docker ps | grep "namenode"
 ``` 
 #### Resultado:
-<img src="grep-namenode.png" alt="Contâiner NameNode">
+<img src="img/grep-namenode.png" alt="Contâiner NameNode">
 <!-- #endregion -->
 
 #### Comandos HDFS
@@ -265,7 +265,7 @@ $ docker exec -it namenode bash
 ```
 
 #### Resultado:
-<img src="FS-Shell.png" alt="Acesso no Shell do Linux do contâiner">
+<img src="img/FS-Shell.png" alt="Acesso no Shell do Linux do contâiner">
 
 
 
@@ -280,13 +280,13 @@ $ hdfs dfs -mkdir -p /user/santana/delete
 3. Listar a estrutura de pastas.
 
 #### Resultado:
-<img src="hdfs-dfs-mkdir.png" alt="Cria estrutura de Diretórios">
+<img src="img/hdfs-dfs-mkdir.png" alt="Cria estrutura de Diretórios">
 
 
 
 4. Enviar a pasta “/input/exercises-data/escola” e o arquivo “/input/exercises-data/entrada1.txt” para data
 
-<img src="estruturaArquivos-01.png" alt="Lista estrutura de Diretórios">
+<img src="img/estruturaArquivos-01.png" alt="Lista estrutura de Diretórios">
 
 
 
@@ -298,7 +298,7 @@ $ hdfs dfs -put /input/exercises-data/escola/ /user/santana/data
 $ hdfs dfs -put /input/exercises-data/entrada1.txt /user/santana/data
 ```
 #### Resultado:
-<img src="hdfs-dfs-ls.png" alt="Lista arquivo e diretório copiado">
+<img src="img/hdfs-dfs-ls.png" alt="Lista arquivo e diretório copiado">
 
 
 5. Mover o arquivo “entrada1.txt” para recover
@@ -308,7 +308,7 @@ $ hdfs dfs -mv /user/santana/data/entrada1.txt /user/santana/recover
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-ls2.png" alt="Lista arquivo e diretório copiado">
+<img src="img/hdfs-dfs-ls2.png" alt="Lista arquivo e diretório copiado">
 
 
 6. Baixar o arquivo do hdfs “escola/alunos.json” para o sistema local /
@@ -318,7 +318,7 @@ $ hdfs dfs -get /user/santana/data/escola/alunos.json /diretorio_local/alunos.js
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-get.png" alt="Baixar arquivo para sistema local de arquivos">
+<img src="img/hdfs-dfs-get.png" alt="Baixar arquivo para sistema local de arquivos">
 
 
 7. Apagar a pasta recover (no HDFS)
@@ -328,7 +328,7 @@ $ hdfs dfs -rm -R /user/santana/recover
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-rm.png" alt="Apagar a pasta recover (no HDFS)">
+<img src="img/hdfs-dfs-rm.png" alt="Apagar a pasta recover (no HDFS)">
 
 
 **ATENÇÃO: Quando as operações envolverem ações que vão apagar ou mover conjunto de dados, tome sempre cuidado especial.**
@@ -341,7 +341,7 @@ $ hdfs dfs -rm -R -skipTrash /user/santana/delete
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-rm2.png" alt="Apagar a pasta delete (no HDFS)">
+<img src="img/hdfs-dfs-rm2.png" alt="Apagar a pasta delete (no HDFS)">
 
 
 9. Procurar o arquivo “alunos.csv” dentro do /user
@@ -351,7 +351,7 @@ $ hdfs dfs -find /user/ -name \alunos.csv
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-find.png" alt="Procurar o arquivo “alunos.csv” dentro do /user">
+<img src="img/hdfs-dfs-find.png" alt="Procurar o arquivo “alunos.csv” dentro do /user">
 
 
 10. Mostrar o último 1KB do arquivo “alunos.csv”
@@ -361,7 +361,7 @@ $ hdfs dfs -tail /user/santana/data/escola/alunos.csv
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-tail.png" alt="Mostrar o último 1KB do arquivo “alunos.csv”">
+<img src="img/hdfs-dfs-tail.png" alt="Mostrar o último 1KB do arquivo “alunos.csv”">
 
 
 11. Mostrar as 2 primeiras linhas do arquivo “alunos.csv”
@@ -371,7 +371,7 @@ $ hdfs dfs -cat /user/santana/data/escola/alunos.csv | head -n 2
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-cat-head.png" alt="Mostrar as 2 primeiras linhas do arquivo “alunos.csv”">
+<img src="img/hdfs-dfs-cat-head.png" alt="Mostrar as 2 primeiras linhas do arquivo “alunos.csv”">
 
 
 12. Verificação de soma das informações do arquivo “alunos.csv”
@@ -381,7 +381,7 @@ $ hdfs dfs -checksum /user/santana/data/escola/alunos.csv
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-checksum.png" alt="Verificação de soma das informações do arquivo “alunos.csv”">
+<img src="img/hdfs-dfs-checksum.png" alt="Verificação de soma das informações do arquivo “alunos.csv”">
 
 
 13. Criar um arquivo em branco com o nome de “test” no data 
@@ -391,7 +391,7 @@ $ hdfs dfs -touchz /user/santana/data/test
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-touchz.png" alt="Criar um arquivo em branco ">
+<img src="img/hdfs-dfs-touchz.png" alt="Criar um arquivo em branco ">
 
 
 ### Diminuir o fator de replicação
@@ -408,7 +408,7 @@ $ hdfs dfs -setrep 2 /user/santana/data/test
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-setrep.png" alt="Alterar o fator de replicação do arquivo “test” para 2">
+<img src="img/hdfs-dfs-setrep.png" alt="Alterar o fator de replicação do arquivo “test” para 2">
 
 
 15. Ver as informações do arquivo “alunos.csv”
@@ -422,7 +422,7 @@ $ hdfs dfs -stat %u /user/santana/data/test
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-stats.png" alt="Alterar o fator de replicação do arquivo “test” para 2">
+<img src="img/hdfs-dfs-stats.png" alt="Alterar o fator de replicação do arquivo “test” para 2">
 
 
 16. Exibir o espaço livre do data (no HDFS) e o uso do disco
@@ -434,7 +434,7 @@ $ hdfs dfs -du -h /user
 ```
 
 #### Resultado:
-<img src="hdfs-dfs-df.png" alt="Exibir o espaço livre do data (no HDFS) e o uso do disco">
+<img src="img/hdfs-dfs-df.png" alt="Exibir o espaço livre do data (no HDFS) e o uso do disco">
 
 
 Pronto!
